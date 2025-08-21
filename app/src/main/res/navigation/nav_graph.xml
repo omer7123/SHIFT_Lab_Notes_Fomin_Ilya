@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.shift_lab.homeFragment.HomeFragment"
+        android:name="com.example.shift_lab.ui.homeFragment.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/addNoteFragment"
-        android:name="com.example.shift_lab.addNoteFragment.AddNoteFragment"
+        android:name="com.example.shift_lab.ui.addNoteFragment.AddNoteFragment"
         android:label="fragment_add_note"
         tools:layout="@layout/fragment_add_note" />
 </navigation>

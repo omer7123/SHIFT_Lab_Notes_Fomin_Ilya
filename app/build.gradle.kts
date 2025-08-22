@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -41,9 +42,7 @@ android {
         viewBinding = true
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
+
 }
 
 dependencies {
@@ -71,13 +70,11 @@ dependencies {
     implementation(libs.androidx.ui)
     debugImplementation(libs.androidx.ui.tooling)
 
-    val room_version = "2.7.2"
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.room.compiler)
+    implementation(libs.androidx.room.ktx)
 
-    implementation("androidx.room:room-runtime:$room_version")
-
-    ksp("androidx.room:room-compiler:$room_version")
-
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
-    implementation("androidx.room:room-ktx:$room_version")
+    implementation (libs.dagger)
+    implementation("com.google.dagger:dagger-compiler:2.57.1")
+    ksp("com.google.dagger:dagger-compiler:2.57.1")
 }

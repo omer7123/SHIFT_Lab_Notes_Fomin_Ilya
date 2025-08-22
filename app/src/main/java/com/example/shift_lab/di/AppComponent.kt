@@ -4,7 +4,9 @@ import android.content.Context
 import com.example.shift_lab.MainActivity
 import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Singleton
 
+@Singleton
 @Component(modules = [DomainModule::class, DataModule::class, DataSourceModule::class])
 interface AppComponent {
     fun inject(activity: MainActivity)

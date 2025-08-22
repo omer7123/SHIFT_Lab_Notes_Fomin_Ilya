@@ -1,6 +1,5 @@
 package com.example.shift_lab.ui.homeFragment
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,14 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.shift_lab.R
 import com.example.shift_lab.ui.theme.AppTheme
 
 
 class HomeFragment : Fragment() {
 
-
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,7 +43,7 @@ class HomeFragment : Fragment() {
                     floatingActionButton = {
                         FloatingActionButton(
                             onClick = {
-
+                                findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
                             },
                         ) { Text("+") }
 

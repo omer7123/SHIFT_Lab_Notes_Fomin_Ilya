@@ -35,4 +35,14 @@ class RoomDataSourceImpl @Inject constructor(
         )
     }.flowOn(Dispatchers.IO)
 
+    override suspend fun deleteNote(id: Int): Flow<Resource<Unit>> = flow{
+        emit(Resource.Loading)
+
+        emit(
+            getResult {
+                db.deleteNote(id)
+            }
+        )
+    }.flowOn(Dispatchers.IO)
+
 }

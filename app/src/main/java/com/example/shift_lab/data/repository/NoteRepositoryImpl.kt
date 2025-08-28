@@ -14,7 +14,7 @@ import javax.inject.Inject
 class NoteRepositoryImpl @Inject constructor(private val dataSource: NoteDataSource) :
     NoteRepository {
     override suspend fun createNewNote(createNote: NoteCreateEntity): Flow<Resource<Unit>> {
-        return dataSource.createNewNote(createNote.toModel()).checkResource{ it }
+        return dataSource.createNewNote(noteModel = createNote.toModel()).checkResource{ it }
     }
 
     override suspend fun getAllNotes(): Flow<Resource<List<NoteEntity>>> {
@@ -23,6 +23,11 @@ class NoteRepositoryImpl @Inject constructor(private val dataSource: NoteDataSou
                 it.toEntity()
             }
         }
+    }
+
+    override suspend fun deleteNote(id: Int): Flow<Resource<Unit>> {
+        return dataSource.deleteNote(id).checkResource { it }
+
     }
 
 }

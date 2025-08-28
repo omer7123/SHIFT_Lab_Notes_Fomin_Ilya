@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,12 +19,18 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -92,7 +99,7 @@ private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) 
     val viewState =viewModel.screenState.collectAsState()
     when(val state = viewState.value){
         is HomeScreenState.Content -> {
-            HomeScreenContent(state.notes, modifier)
+            HomeScreenContent(state.notes, modifier, onDeleteNote = {viewModel.deleteNote(it)})
         }
         HomeScreenState.Error -> {
             PlaceholderError {
@@ -109,7 +116,10 @@ private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Modifier) {
+private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Modifier, onDeleteNote: (Int) -> Unit) {
+
+    var noteToDelete by remember { mutableStateOf<Int?>(null) }
+
     Column(modifier = modifier.fillMaxSize()) {
         Text(
             text = stringResource(id = R.string.notes),
@@ -123,10 +133,15 @@ private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Mo
                 contentPadding = PaddingValues(vertical = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-                items(notes) { note ->
-                    NoteItem(note) {
-
-                    }
+                items(
+                    items = notes,
+                    key = { it.id }
+                ) { note ->
+                    NoteItem(
+                        note = note,
+                        onItemClick = {},
+                        onItemLongClick = { noteToDelete = it }
+                    )
                 }
             }
         }else{
@@ -137,14 +152,39 @@ private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Mo
             )
         }
     }
+
+    noteToDelete?.let { id ->
+        AlertDialog(
+            onDismissRequest = { noteToDelete = null },
+            title = { Text(text = "Удалить заметку?") },
+            text = { Text(text = "Это действие нельзя отменить.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDeleteNote(id)
+                    noteToDelete = null
+                }) {
+                    Text("Удалить")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { noteToDelete = null }) {
+                    Text("Отмена")
+                }
+            }
+        )
+    }
 }
 @Composable
-private fun NoteItem(note: NoteEntityUI, onItemClick: (Int) -> Unit) {
+private fun NoteItem(note: NoteEntityUI, onItemClick: (Int) -> Unit, onItemLongClick: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .background(
                 color = AppTheme.colors.fiveBackground, shape = RoundedCornerShape(10.dp)
+            )
+            .combinedClickable(
+                onClick = { onItemClick(note.id) },
+                onLongClick = { onItemLongClick(note.id) }
             )
             .padding(
                 top = 8.dp, start = 10.dp, end = 10.dp, bottom = 8.dp

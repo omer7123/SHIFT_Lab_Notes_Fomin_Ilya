@@ -35,7 +35,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.shift_lab.R
 import com.example.shift_lab.di.multiViewModelFactory.MultiViewModelFactory
-import com.example.shift_lab.domain.entity.NoteEntity
+import com.example.shift_lab.domain.entity.NoteEntityUI
 import com.example.shift_lab.presentation.homeFragment.HomeScreenState
 import com.example.shift_lab.presentation.homeFragment.HomeViewModel
 import com.example.shift_lab.ui.core.PlaceholderError
@@ -71,6 +71,7 @@ class HomeFragment : Fragment() {
                 Scaffold(
                     floatingActionButton = {
                         FloatingActionButton(
+                            containerColor = AppTheme.colors.fiveBackground,
                             onClick = {
                                 findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
                             },
@@ -94,7 +95,9 @@ private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) 
             HomeScreenContent(state.notes, modifier)
         }
         HomeScreenState.Error -> {
-            PlaceholderError()
+            PlaceholderError {
+                viewModel.getNotes()
+            }
         }
         HomeScreenState.Loading -> {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -106,29 +109,37 @@ private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun HomeScreenContent(notes: List<NoteEntity>, modifier: Modifier = Modifier) {
+private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
         Text(
             text = stringResource(id = R.string.notes),
             style = AppTheme.typography.titleCygreFont,
             modifier = Modifier.padding(16.dp)
         )
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxWidth(),
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(vertical = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            items(notes) { note ->
-                NoteItem(note) {
+        if (notes.isNotEmpty()) {
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxWidth(),
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(vertical = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+                items(notes) { note ->
+                    NoteItem(note) {
 
+                    }
                 }
             }
+        }else{
+            Text(
+                text = stringResource(id = R.string.no_notes),
+                style = AppTheme.typography.bodyM,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(16.dp)
+            )
         }
     }
 }
 @Composable
-private fun NoteItem(note: NoteEntity, onItemClick: (Int) -> Unit) {
+private fun NoteItem(note: NoteEntityUI, onItemClick: (Int) -> Unit) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -147,11 +158,28 @@ private fun NoteItem(note: NoteEntity, onItemClick: (Int) -> Unit) {
 
         Spacer(modifier = Modifier.padding(top = 16.dp))
 
+        if(note.content.isEmpty()){
+            Text(
+                text = stringResource(id = R.string.no_text),
+                style = AppTheme.typography.bodyM,
+                color = AppTheme.colors.secondaryText
+            )
+        }else {
+            Text(
+                text = note.content,
+                maxLines = 3,
+                style = AppTheme.typography.bodyM,
+                color = AppTheme.colors.primaryText
+            )
+        }
+
+        Spacer(modifier = Modifier.padding(top = 16.dp))
+
         Text(
-            text = note.content,
-            maxLines = 3,
+            text = note.dateCreate,
+            maxLines = 2,
             style = AppTheme.typography.bodyM,
-            color = AppTheme.colors.primaryText
+            color = AppTheme.colors.secondaryText
         )
     }
 }

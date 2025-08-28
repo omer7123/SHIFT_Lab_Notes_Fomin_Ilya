@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import com.example.shift_lab.R
 import com.example.shift_lab.di.multiViewModelFactory.MultiViewModelFactory
 import com.example.shift_lab.presentation.addNoteFragment.AddNoteScreenState
 import com.example.shift_lab.presentation.addNoteFragment.AddNoteViewModel
@@ -67,7 +69,7 @@ class AddNoteFragment : Fragment() {
     ): View = ComposeView(requireContext()).apply {
         setContent {
             AppTheme {
-                Scaffold { _ ->
+                Scaffold { innerPadding ->
                     AddNoteScreen(
                         modifier = Modifier
                             .background(color = AppTheme.colors.screenBackground),
@@ -136,7 +138,7 @@ class AddNoteFragment : Fragment() {
                 IconButton(onClick = { onBackClick() }) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = stringResource(R.string.back),
                         tint = AppTheme.colors.primaryText
                     )
                 }

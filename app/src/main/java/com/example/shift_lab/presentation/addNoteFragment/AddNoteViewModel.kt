@@ -1,6 +1,5 @@
 package com.example.shift_lab.presentation.addNoteFragment
 
-import androidx.compose.foundation.text.InlineTextContent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shift_lab.core.Resource
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
 class AddNoteViewModel @Inject constructor(
@@ -25,9 +24,8 @@ class AddNoteViewModel @Inject constructor(
     val screenState: StateFlow<AddNoteScreenState> = _screenState.asStateFlow()
 
     fun saveNote(){
-
         val currState = screenState.value
-        val note = NoteCreateEntity(currState.title, currState.content, Date().toString())
+        val note = NoteCreateEntity(currState.title, currState.content, ZonedDateTime.now())
         viewModelScope.launch {
             useCase(note).collect {state ->
                 when(state) {
@@ -58,32 +56,24 @@ class AddNoteViewModel @Inject constructor(
     }
 
     fun changeTitle(rawTitle: String) {
-        val formatted = formatTitle(rawTitle.take(16))
 
         _screenState.update { state ->
-            val hasContent = formatted.isNotBlank() || state.content.isNotBlank()
+            val hasContent = rawTitle.isNotBlank() || state.content.isNotBlank()
             state.copy(
-                title = formatted,
+                title = rawTitle,
                 visibleBtnSave = hasContent
             )
         }
     }
 
     fun changeContent(text: String) {
-        val formatted = formatTitle(text)
 
         _screenState.update { state ->
-            val hasContent = state.title.isNotBlank() || formatted.isNotBlank()
+            val hasContent = state.title.isNotBlank() || text.isNotBlank()
             state.copy(
                 content = text,
                 visibleBtnSave = hasContent
             )
         }
-    }
-
-    private fun formatTitle(input: String): String {
-        return if (input.isNotEmpty()) {
-            input[0].uppercaseChar() + input.substring(1)
-        } else ""
     }
 }

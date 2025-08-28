@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +18,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
@@ -53,6 +56,12 @@ class HomeFragment : Fragment() {
         super.onAttach(context)
         requireContext().getAppComponent().noteComponent().create().inject(this)
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getNotes()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,6 +85,7 @@ class HomeFragment : Fragment() {
     }
 }
 
+
 @Composable
 private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
     val viewState =viewModel.screenState.collectAsState()
@@ -87,7 +97,9 @@ private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) 
             PlaceholderError()
         }
         HomeScreenState.Loading -> {
-
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
         }
     }
 

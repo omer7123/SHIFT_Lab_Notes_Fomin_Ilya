@@ -4,5 +4,6 @@
     <string name="notes">Заметки</string>
     <string name="not_found">Не найдено</string>
     <string name="unknown_error_placeholder">Извините, произошла непредивденная ошибка. Попробуйте немного позже</string>
+    <string name="thank">Спасибо</string>
 
 </resources>

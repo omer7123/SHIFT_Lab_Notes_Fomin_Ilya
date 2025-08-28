@@ -1,5 +1,6 @@
 package com.example.shift_lab.presentation.homeFragment
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shift_lab.core.Resource
@@ -16,12 +17,17 @@ class HomeViewModel @Inject constructor(
     val screenState: StateFlow<HomeScreenState> = _screenState
 
     init {
+        getNotes()
+    }
+
+    fun getNotes(){
         viewModelScope.launch {
             getAllNotesUseCase().collect { status ->
                 when(status){
                     is Resource.Error -> HomeScreenState.Error
                     Resource.Loading -> HomeScreenState.Loading
                     is Resource.Success -> {
+                        Log.e("Date: ", "${status.data[0].dateCreate}")
                         _screenState.value = HomeScreenState.Content(status.data)
                     }
                 }

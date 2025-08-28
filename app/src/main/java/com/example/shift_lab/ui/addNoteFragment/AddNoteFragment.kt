@@ -46,6 +46,7 @@ import com.example.shift_lab.di.multiViewModelFactory.MultiViewModelFactory
 import com.example.shift_lab.presentation.addNoteFragment.AddNoteScreenState
 import com.example.shift_lab.presentation.addNoteFragment.AddNoteViewModel
 import com.example.shift_lab.ui.core.PlaceholderError
+import com.example.shift_lab.ui.homeFragment.HomeFragment
 import com.example.shift_lab.ui.theme.AppTheme
 import com.example.shift_lab.util.getAppComponent
 import javax.inject.Inject
@@ -57,10 +58,19 @@ class AddNoteFragment : Fragment() {
     private val viewModel: AddNoteViewModel by lazy {
         ViewModelProvider(this, viewModelFactory)[AddNoteViewModel::class.java]
     }
+    private var idNote: Int? = null
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireContext().getAppComponent().noteComponent().create().inject(this)
+        idNote = arguments?.getInt(HomeFragment.ID)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        idNote?.let {
+            viewModel.getNoteById(it)
+        }
     }
 
     override fun onCreateView(
@@ -114,7 +124,7 @@ class AddNoteFragment : Fragment() {
                     content = viewState.value,
                     onChangeTitle = { viewModel.changeTitle(it) },
                     onChangeContent = { viewModel.changeContent(it) },
-                    onSaveBtnClick = { viewModel.saveNote() },
+                    onSaveBtnClick = { viewModel.saveNote(idNote) },
                     onBackClick = { navController.popBackStack() }
                 )
             }

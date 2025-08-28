@@ -37,8 +37,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.example.shift_lab.R
 import com.example.shift_lab.di.multiViewModelFactory.MultiViewModelFactory
@@ -85,21 +87,42 @@ class HomeFragment : Fragment() {
                         ) { Text("+") }
 
                     }) { innerPadding ->
-                    HomeScreen(viewModel = viewModel, modifier = Modifier.padding(innerPadding))
+                    HomeScreen(
+                        viewModel = viewModel,
+                        modifier = Modifier.padding(innerPadding),
+                        navController = findNavController()
+                    )
                 }
             }
-
         }
+    }
+
+    companion object{
+        const val ID = "id"
     }
 }
 
 
 @Composable
-private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) {
+private fun HomeScreen(
+    viewModel: HomeViewModel,
+    modifier: Modifier = Modifier,
+    navController: NavController
+) {
     val viewState =viewModel.screenState.collectAsState()
     when(val state = viewState.value){
         is HomeScreenState.Content -> {
-            HomeScreenContent(state.notes, modifier, onDeleteNote = {viewModel.deleteNote(it)})
+            HomeScreenContent(
+                state.notes,
+                modifier,
+                onItemClick = {
+                    navController.navigate(
+                        R.id.action_homeFragment_to_addNoteFragment,
+                        bundleOf(HomeFragment.ID to it)
+                    )
+                },
+                onDeleteNote = {viewModel.deleteNote(it)})
+
         }
         HomeScreenState.Error -> {
             PlaceholderError {
@@ -116,7 +139,7 @@ private fun HomeScreen(viewModel: HomeViewModel, modifier: Modifier = Modifier) 
 }
 
 @Composable
-private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Modifier, onDeleteNote: (Int) -> Unit) {
+private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Modifier, onItemClick: (Int) -> Unit, onDeleteNote: (Int) -> Unit) {
 
     var noteToDelete by remember { mutableStateOf<Int?>(null) }
 
@@ -139,7 +162,7 @@ private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Mo
                 ) { note ->
                     NoteItem(
                         note = note,
-                        onItemClick = {},
+                        onItemClick = {onItemClick(it)},
                         onItemLongClick = { noteToDelete = it }
                     )
                 }

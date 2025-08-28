@@ -45,4 +45,23 @@ class RoomDataSourceImpl @Inject constructor(
         )
     }.flowOn(Dispatchers.IO)
 
+    override suspend fun getNoteById(id: Int): Flow<Resource<NoteModel>> = flow{
+        emit(Resource.Loading)
+
+        emit(
+            getResult {
+                db.getNoteById(id)
+            }
+        )
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun updateNote(noteModel: NoteModel): Flow<Resource<Unit>> = flow{
+        emit(Resource.Loading)
+        emit(
+            getResult {
+                db.createNewNote(noteModel)
+            }
+        )
+    }.flowOn(Dispatchers.IO)
+
 }

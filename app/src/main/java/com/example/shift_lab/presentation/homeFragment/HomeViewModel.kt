@@ -1,6 +1,5 @@
 package com.example.shift_lab.presentation.homeFragment
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shift_lab.core.Resource

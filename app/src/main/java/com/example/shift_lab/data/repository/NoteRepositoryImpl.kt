@@ -27,7 +27,18 @@ class NoteRepositoryImpl @Inject constructor(private val dataSource: NoteDataSou
 
     override suspend fun deleteNote(id: Int): Flow<Resource<Unit>> {
         return dataSource.deleteNote(id).checkResource { it }
+    }
 
+    override suspend fun getNoteById(id: Int): Flow<Resource<NoteEntity>> {
+        return dataSource.getNoteById(id).checkResource {
+            it.toEntity()
+        }
+    }
+
+    override suspend fun updateNote(note: NoteEntity): Flow<Resource<Unit>> {
+        return dataSource.updateNote(note.toModel()).checkResource {
+            it
+        }
     }
 
 }

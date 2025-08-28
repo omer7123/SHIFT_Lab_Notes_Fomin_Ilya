@@ -41,4 +41,14 @@ class NoteRepositoryImpl @Inject constructor(private val dataSource: NoteDataSou
         }
     }
 
+    override suspend fun getDraft(): Flow<Resource<NoteEntity?>> {
+        return dataSource.getDraft().checkResource {
+            it?.toEntity()
+        }
+    }
+
+    override suspend fun removeDraft(id: Int): Flow<Resource<Unit>> {
+        return dataSource.removeDraft(id).checkResource { it }
+    }
+
 }

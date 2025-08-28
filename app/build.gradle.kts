@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.fragment)
     implementation(libs.androidx.ui.tooling.preview)
+//    implementation(libs.activity.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -63,6 +64,8 @@ dependencies {
     val composeBom = platform("androidx.compose:compose-bom:2024.10.01")
     implementation(composeBom)
     androidTestImplementation(composeBom)
+    implementation(libs.androidx.activity.compose)
+
 
     implementation(libs.androidx.material3)
 

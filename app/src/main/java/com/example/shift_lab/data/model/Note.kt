@@ -10,5 +10,6 @@ data class NoteModel(
     val id: Int = 0,
     val title: String,
     val content: String,
-    val dateCreate: ZonedDateTime
+    val dateCreate: ZonedDateTime,
+    val draft: Boolean,
 )

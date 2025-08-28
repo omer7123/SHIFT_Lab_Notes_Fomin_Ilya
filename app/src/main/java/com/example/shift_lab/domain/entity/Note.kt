@@ -7,6 +7,7 @@ data class NoteEntity(
     val title: String,
     val content: String,
     val dateCreate: ZonedDateTime,
+    val draft: Boolean
 )
 
 data class NoteEntityUI(
@@ -20,4 +21,5 @@ data class NoteCreateEntity(
     val title: String,
     val content: String,
     val dateCreate: ZonedDateTime,
+    val isDraft: Boolean = false,
 )

@@ -5,10 +5,10 @@ import com.example.shift_lab.domain.entity.NoteCreateEntity
 import com.example.shift_lab.domain.entity.NoteEntity
 
 fun NoteEntity.toModel() =
-    NoteModel(id = this.id, title = this.title, content = this.content, dateCreate = this.dateCreate)
+    NoteModel(id = this.id, title = this.title, content = this.content, dateCreate = this.dateCreate, draft = this.draft)
 
 fun NoteCreateEntity.toModel() =
-    NoteModel(title = this.title, content = this.content, dateCreate = this.dateCreate)
+    NoteModel(title = this.title, content = this.content, dateCreate = this.dateCreate, draft = this.isDraft)
 
 fun NoteModel.toEntity() =
-    NoteEntity(id, title, content, dateCreate)
+    NoteEntity(id, title, content, dateCreate, draft)

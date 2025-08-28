@@ -12,4 +12,7 @@ interface NoteRepository {
     suspend fun getNoteById(id: Int): Flow<Resource<NoteEntity>>
     suspend fun updateNote(note: NoteEntity): Flow<Resource<Unit>>
 
+    suspend fun getDraft(): Flow<Resource<NoteEntity?>>
+    suspend fun removeDraft(id: Int): Flow<Resource<Unit>>
+
 }

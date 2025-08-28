@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -139,8 +141,12 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun HomeScreenContent(notes: List<NoteEntityUI>, modifier: Modifier = Modifier, onItemClick: (Int) -> Unit, onDeleteNote: (Int) -> Unit) {
-
+private fun HomeScreenContent(
+    notes: List<NoteEntityUI>,
+    modifier: Modifier = Modifier,
+    onItemClick: (Int) -> Unit,
+    onDeleteNote: (Int) -> Unit
+) {
     var noteToDelete by remember { mutableStateOf<Int?>(null) }
 
     Column(modifier = modifier.fillMaxSize()) {

@@ -6,7 +6,9 @@ import com.example.shift_lab.core.Resource
 import com.example.shift_lab.domain.entity.NoteCreateEntity
 import com.example.shift_lab.domain.entity.NoteEntity
 import com.example.shift_lab.domain.useCases.CreateNoteUseCase
+import com.example.shift_lab.domain.useCases.GetDraftUseCase
 import com.example.shift_lab.domain.useCases.GetNoteByIdUseCase
+import com.example.shift_lab.domain.useCases.RemoveDraftUseCase
 import com.example.shift_lab.domain.useCases.UpdateNoteUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +21,9 @@ import javax.inject.Inject
 class AddNoteViewModel @Inject constructor(
     private val createNoteUseCase: CreateNoteUseCase,
     private val getNoteByIdUseCase: GetNoteByIdUseCase,
-    private val updateNoteUseCase: UpdateNoteUseCase
+    private val updateNoteUseCase: UpdateNoteUseCase,
+    private val getDraftUseCase: GetDraftUseCase,
+    private val removeDraftUseCase: RemoveDraftUseCase
 ): ViewModel() {
 
     private val _screenState = MutableStateFlow(
@@ -28,28 +32,43 @@ class AddNoteViewModel @Inject constructor(
 
     val screenState: StateFlow<AddNoteScreenState> = _screenState.asStateFlow()
 
-    fun saveNote(idNote: Int?) {
-        if (idNote != null) {
-            updateNote(idNote)
-        } else {
-            createNewNote()
-        }
+    private var idNoteGl: Int? = null
+
+    init {
+        getDraft()
     }
 
-    private fun updateNote(idNote: Int) {
-        val currState = screenState.value
-        val note = NoteEntity(idNote,currState.title, currState.content, ZonedDateTime.now())
 
+    private fun getDraft() {
         viewModelScope.launch {
-            updateNoteUseCase(note).collect { state->
+            getDraftUseCase().collect { state ->
+
                 when(state){
-                    is Resource.Error -> _screenState.update { it.copy(error = true) }
+                    is Resource.Error ->{
+                        if (state.data == null && state.msg == "Не найдено") {
+                            _screenState.update {
+                                it.copy(
+                                    loading = false,
+                                    error = false,
+                                )
+                            }
+
+                        }else _screenState.update { it.copy(error = true) }
+                    }
                     Resource.Loading -> _screenState.update { it.copy(loading = true) }
                     is Resource.Success -> {
-                        _screenState.update {
-                            it.copy(
-                                successSave = true
-                            )
+                        state.data?.let { note->
+                            idNoteGl = note.id
+                            _screenState.update { it ->
+                                it.copy(
+                                    title = note.title,
+                                    content = note.content,
+                                    loading = false,
+                                    draft = true,
+                                    error = false,
+                                    visibleBtnSave = true
+                                )
+                            }
                         }
                     }
                 }
@@ -57,28 +76,58 @@ class AddNoteViewModel @Inject constructor(
         }
     }
 
-    private fun createNewNote() {
-        val currState = screenState.value
-        val note = NoteCreateEntity(currState.title, currState.content, ZonedDateTime.now())
-        viewModelScope.launch {
-            createNoteUseCase(note).collect { state ->
-                when(state) {
-                    is Resource.Error -> _screenState.update {
-                        it.copy(error = true)
-                    }
-                    Resource.Loading -> _screenState.update {
-                        it.copy(
-                            loading = true
-                        )
-                    }
-                    is Resource.Success -> {
-                        _screenState.update {
-                            it.copy(
-                                successSave = true
-                            )
+    fun saveNote(idNote: Int?) {
+        if (idNoteGl != null){
+            viewModelScope.launch {
+                removeDraftUseCase(idNoteGl!!).collect{state->
+                    when(state){
+                        is Resource.Error -> {
+                            _screenState.update { it.copy(error = true) }
+                        }
+                        Resource.Loading -> {
+                            _screenState.update { it.copy(loading = true) }
+                        }
+                        is Resource.Success -> {
+                            _screenState.update {
+                                it.copy(successSave = true)
+                            }
                         }
                     }
                 }
+            }
+        }
+        else if (idNote != null) {
+            updateNote(idNote, false)
+        } else {
+            val currState = screenState.value
+            val note = NoteCreateEntity(currState.title, currState.content, ZonedDateTime.now())
+
+            createNewNote(note)
+        }
+    }
+
+    fun saveDraft(idNote: Int?) {
+        if (idNote != null) {
+            _screenState.update { state ->
+                state.copy(
+                    successSave = true
+                )
+            }
+            return
+        }
+
+        if(!_screenState.value.draft){
+            val currState = screenState.value
+            val note = NoteCreateEntity(
+                    currState.title,
+                    currState.content,
+                    ZonedDateTime.now(),
+                    true
+            )
+            createNewNote(note)
+        }else{
+            idNoteGl?.let {
+                updateNote(it, true)
             }
         }
     }
@@ -129,6 +178,51 @@ class AddNoteViewModel @Inject constructor(
                                 content = state.data.content,
                                 loading = false,
                                 error = false,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateNote(idNote: Int, draft: Boolean) {
+        val currState = screenState.value
+        val note = NoteEntity(idNote,currState.title, currState.content, ZonedDateTime.now(), draft)
+
+        viewModelScope.launch {
+            updateNoteUseCase(note).collect { state->
+                when(state){
+                    is Resource.Error -> _screenState.update { it.copy(error = true) }
+                    Resource.Loading -> _screenState.update { it.copy(loading = true) }
+                    is Resource.Success -> {
+                        _screenState.update {
+                            it.copy(
+                                successSave = true
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun createNewNote(note: NoteCreateEntity) {
+        viewModelScope.launch {
+            createNoteUseCase(note).collect { state ->
+                when(state) {
+                    is Resource.Error -> _screenState.update {
+                        it.copy(error = true)
+                    }
+                    Resource.Loading -> _screenState.update {
+                        it.copy(
+                            loading = true
+                        )
+                    }
+                    is Resource.Success -> {
+                        _screenState.update {
+                            it.copy(
+                                successSave = true
                             )
                         }
                     }

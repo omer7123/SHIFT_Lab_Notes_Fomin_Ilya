@@ -8,5 +8,9 @@
     <string name="thank">Спасибо</string>
     <string name="back">Назад</string>
     <string name="no_notes">Извините, но на данный момент вы еще не добавляли заметки. Самое время начать :)</string>
+    <string name="hint_note">Введите заметку...</string>
+    <string name="done">Done</string>
+    <string name="hint_title">Введите заголовок...</string>
+    <string name="title">Заголовок</string>
 
 </resources>

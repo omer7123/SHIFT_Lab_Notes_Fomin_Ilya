@@ -2,9 +2,11 @@ package com.example.shift_lab.ui.addNoteFragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -125,7 +127,9 @@ class AddNoteFragment : Fragment() {
                     onChangeTitle = { viewModel.changeTitle(it) },
                     onChangeContent = { viewModel.changeContent(it) },
                     onSaveBtnClick = { viewModel.saveNote(idNote) },
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = {
+                        viewModel.saveDraft(idNote)
+                    }
                 )
             }
         }
@@ -141,6 +145,9 @@ class AddNoteFragment : Fragment() {
         onSaveBtnClick: () -> Unit,
         onBackClick: () -> Unit,
     ) {
+        BackHandler {
+            onBackClick()
+        }
         val scrollState = rememberScrollState()
 
         Column(modifier = modifier) {
@@ -157,7 +164,7 @@ class AddNoteFragment : Fragment() {
                     IconButton(onClick = { onSaveBtnClick() }) {
                         Icon(
                             imageVector = Icons.Default.Done,
-                            contentDescription = "Done",
+                            contentDescription = stringResource(R.string.done),
                             tint = AppTheme.colors.primaryBackground
                         )
                     }
@@ -180,10 +187,10 @@ class AddNoteFragment : Fragment() {
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences
                     ),
-                    label = { Text(text = "Заголовок") },
+                    label = { Text(text = stringResource(R.string.title)) },
                     maxLines = 1,
                     singleLine = true,
-                    placeholder = { Text(text = "Введите заголовок...") },
+                    placeholder = { Text(text = stringResource(R.string.hint_title)) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -199,7 +206,7 @@ class AddNoteFragment : Fragment() {
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences
                     ),
-                    placeholder = { Text("Введите заметку...") },
+                    placeholder = { Text(stringResource(R.string.hint_note)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp)

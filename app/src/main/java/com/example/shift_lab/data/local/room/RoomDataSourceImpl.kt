@@ -39,7 +39,7 @@ class RoomDataSourceImpl @Inject constructor(
         emit(Resource.Loading)
 
         emit(
-            getResult {
+            saveResult {
                 db.deleteNote(id)
             }
         )
@@ -58,10 +58,26 @@ class RoomDataSourceImpl @Inject constructor(
     override suspend fun updateNote(noteModel: NoteModel): Flow<Resource<Unit>> = flow{
         emit(Resource.Loading)
         emit(
-            getResult {
+            saveResult {
                 db.createNewNote(noteModel)
             }
         )
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun getDraft(): Flow<Resource<NoteModel?>> = flow{
+        emit(Resource.Loading)
+        emit(
+            getResult {
+                db.getDraft()
+            }
+        )
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun removeDraft(id: Int): Flow<Resource<Unit>> = flow{
+        emit(Resource.Loading)
+        emit(getResult {
+            db.removeDraft(id)
+        })
     }.flowOn(Dispatchers.IO)
 
 }

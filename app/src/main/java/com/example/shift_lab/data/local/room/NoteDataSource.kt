@@ -10,5 +10,8 @@ interface NoteDataSource {
     suspend fun deleteNote(id: Int): Flow<Resource<Unit>>
     suspend fun getNoteById(id: Int): Flow<Resource<NoteModel>>
     suspend fun updateNote(noteModel: NoteModel): Flow<Resource<Unit>>
+    suspend fun getDraft(): Flow<Resource<NoteModel?>>
+    suspend fun removeDraft(id: Int): Flow<Resource<Unit>>
+
 
 }
